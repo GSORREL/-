@@ -1,0 +1,153 @@
+<!-- 引入wxs脚本 -->
+<wxs src="../wxs/subUtil.wxs" module="tools" />
+
+<!--index.wxml-->
+<navbar title="我的" showHome="{{false}}" light="{{true}}">
+<view class="page">
+
+
+    <!--头部个人信息-->
+    <view class="user-section">
+
+        <view class="head-pic">
+            <block wx:if="{{avatarUrl}}">
+                <image wx:if="{{avatarUrl}}" src="{{avatarUrl}}"></image>
+            </block>
+            <block wx:else>
+                <image wx:if="{{avatarDefaultUrl}}" src="{{avatarDefaultUrl}}"></image>
+            </block>
+
+        </view>
+
+
+        <view class="user-info">
+            <view class="text-desc">
+                <block wx:if="{{hasPhoneNumber}}">
+                    <view class="phone-num">
+                        {{tools.sub(phoneNumber, 3, 4)}}
+<!--                        {{phoneNumber}}-->
+                    </view>
+                </block>
+                <block wx:else>
+                    <view class="bing-phone" hover-class="button-hover" bindtap='bindphone'>
+                        登录/注册
+                    </view>
+                </block>
+            </view>
+            <view class="text-tip">
+                找车库，就用甬城泊车
+            </view>
+        </view>
+
+    </view>
+
+
+    <!--账户信息-->
+    <view class="amount-section">
+        <view class="amount-box">
+            <view class="amount-info">
+                <image class="left-pic" src='../../images/icon_mine_qianbao.png'></image>
+                <view class="text-con">
+                    <view class="text-num">{{sysbalance}}</view>
+                    <view class="text-tip">钱包余额(元)</view>
+                </view>
+            </view>
+            <navigator url='../wallet/wallet' hover-class='none' >
+                <button class='btn-charge' hover-class="none">
+                    <view>去充值</view>
+                </button>
+            </navigator>
+        </view>
+    </view>
+
+
+    <!--快捷入口-->
+    <view class="quick-section">
+        <navigator class="bill-box" url='../billlist/billlist' hover-class='none'>
+            <view>
+                <view class="text-desc">我的账单</view>
+                <view class="text-tip">费用记录都在这里</view>
+            </view>
+            <view class="right-icon">
+                <image class="left-pic" src='../../images/icon_fapiao.png'></image>
+            </view>
+        </navigator>
+        <navigator class="carbind-box" url='../carmanage/carmanage' hover-class='none'>
+            <view>
+                <view class="text-desc">车辆管理</view>
+                <view class="text-tip">{{carcount}}辆绑定</view>
+            </view>
+            <view class="right-icon">
+                <image class="left-pic" src='../../images/icon_cheliang.png'></image>
+            </view>
+        </navigator>
+    </view>
+
+    <!--列表-->
+    <view class="list-section">
+        <!--发票助手-->
+        <view bindtap="goInVoice" class="list-cell">
+            <view>
+                <text>发票助手</text>
+            </view>
+            <view class="right-con">
+                <image class="list-arrow" src='../../images/icon_jiantou.png'></image>
+            </view>
+        </view>
+        <!--停车记录-->
+        <navigator url='../parkrecord/parkrecord' hover-class="none" class="list-cell">
+            <view>
+                <text>停车记录</text>
+            </view>
+            <view class="right-con">
+                <image class="list-arrow" src='../../images/icon_jiantou.png'></image>
+            </view>
+        </navigator>
+        <!--问题反馈-->
+        <view bindtap="gotoFeedbackList" class="list-cell">
+            <view>
+                <text>问题反馈</text>
+            </view>
+            <view class="right-con">
+                <text class="text-tip">期待你的建议</text>
+                <image class="list-arrow" src='../../images/icon_jiantou.png'></image>
+            </view>
+        </view>
+        <!--使用帮助-->
+        <view class="list-cell" bindtap='goHelpUrl'>
+            <view>
+                <text>使用帮助</text>
+            </view>
+            <view class="right-con">
+                <image class="list-arrow" src='../../images/icon_jiantou.png'></image>
+            </view>
+        </view>
+        <!--关于我们-->
+        <navigator url='../aboutus/aboutus' hover-class="none" class="list-cell">
+            <view>
+                <text>关于我们</text>
+            </view>
+            <view class="right-con">
+                <text class="text-tip"></text>
+                <image class="list-arrow" src='../../images/icon_jiantou.png'></image>
+            </view>
+        </navigator>
+
+    </view>
+
+
+    <!-- 退出 -->
+    <view class="exit-bar">
+        <block wx:if="{{hasPhoneNumber}}">
+            <view class="btn-exit" hover-class="" bindtap="exit">
+                退出
+            </view>
+        </block>
+    </view>
+
+
+    <import src="../../components/template/invoicedialog/invoicedialog.wxml"></import>
+    <template is="invoicedialog" data="" wx:if="{{showInVoiceTip}}"></template>
+
+</view>
+</navbar>

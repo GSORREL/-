@@ -1,0 +1,277 @@
+<!-- index.wxml -->
+<!-- <navbar showHome="{{false}}" title="甬城泊车" light="{{true}}"> -->
+    <navbar showHome="{{false}}" showLocation="{{true}}" title="甬城泊车" light="{{true}}">
+    <view class="page" style='height:100%;'>
+        <scroll-view scroll-y='true' style='height:100%'>
+            <view class="list">
+                <!-- 轮播图 -->
+                <view class="carousel-section">
+                    <view class="carousel-box">
+                        <swiper indicator-dots="{{adsIndicatorDots}}" autoplay="{{adsAutoplay}}" interval="{{adsInterval}}" duration="{{adsDuration}}" current="{{currentSwiper}}" bindanimationfinish="adsswiperChange">
+                            <block wx:for="{{carouselInfoList}}" wx:key="{{item}}">
+                                <swiper-item class="carousel-item-box">
+                                    <view class="carousel-item">
+                                        <!-- <image src="../../images/banner_demo.png" width="100%"  mode='widthFix'></image> -->
+                                        <image src="{{item.img}}" mode="aspectFill" data-item="{{item}}" bindtap="clickBannerView" mode='widthFix' width="100%"></image>
+                                    </view>
+                                </swiper-item>
+                            </block>
+                        </swiper>
+                    </view>
+                    <!-- 自定义swiper指示器 -->
+                    <view class="swiper-dots">
+                        <block wx:for="{{carouselInfoList}}" wx:key="{{item}}">
+                            <view class="carousel-dot {{index == currentSwiper ? 'active':''}}"></view>
+                        </block>
+                    </view>
+                </view>
+                <!-- 快捷图标 -->
+                <view class="cate-section">
+                    <navigator class="nav-item" url='../billlist/billlist' hover-class='none'>
+                        <view class="cate-item">
+                            <view class="cate-item-main">
+                                <image src="../../images/icon_zhangdan.png"></image>
+                                <text class="text-desc">我的账单</text>
+                            </view>
+                        </view>
+                    </navigator>
+                    <navigator class="nav-item" url='../parkrecord/parkrecord' hover-class='none'>
+                        <view class="cate-item">
+                            <view class="cate-item-main">
+                                <image src="../../images/icon_jilu.png"></image>
+                                <text class="text-desc">停车记录</text>
+                            </view>
+                            <view class="owe-tip" wx:if="{{!ishiddenRepycount}}">
+                                <image src="../../images/icon_qianfei.png"></image>
+                            </view>
+                        </view>
+                    </navigator>
+                    <view class="nav-item" bindtap="gotoWallet" hover-class='none'>
+                        <view class="cate-item">
+                            <view class="cate-item-main">
+                                <image src="../../images/icon_qianbao.png"></image>
+                                <text class="text-desc">我的钱包</text>
+                            </view>
+                        </view>
+                    </view>
+                    <navigator wx:if="{{isCharge == 1}}" class="nav-item" url='../chargingPilePage/chargingpile/chargingpile' hover-class='none'>
+                        <view class="cate-item">
+                            <view class="cate-item-main">
+                                <image src="../../images/icon_chongdianzhuang.png"></image>
+                                <text class="text-desc">充电桩</text>
+                            </view>
+<!--                            <view class="owe-tip" wx:if="{{!ishiddenRepycount}}">
+                                <image src="../../images/icon_qianfei.png"></image>
+                            </view>-->
+                        </view>
+                    </navigator>
+                </view>
+                <!-- 车辆卡片 -->
+                <view class="carinfo">
+                    <!-- 用户没有绑定车辆 -->
+                    <block wx:if="{{!hasUserCar}}">
+                        <view class="car-card">
+                            <form bindsubmit="submitInfo" report-submit='true'>
+                                <view class="car-card-box">
+                                    <view class="card-info no-bind">
+                                        <view class="card-info-main">
+                                            <image src="../../images/pic_moren.png" mode="widthFix"></image>
+                                            <text class="text-desc">您还未添加车辆</text>
+                                            <text class="text-tip">- 绑定车辆停车更轻松 -</text>
+                                        </view>
+                                        <button form-type="submit" class="btn-addcar" bindtap="addCar">
+                                            添加车辆
+                                        </button>
+                                    </view>
+                                </view>
+                            </form>
+                        </view>
+                    </block>
+                    <!-- 用户绑定车辆 -->
+                    <block wx:else>
+                        <swiper vertical="{{vertical}}" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" current="{{swiperCurrent}}" indicator-dots="{{indicatorDots}}" bindanimationfinish="swiperChange" bindchange="" class="car-card">
+                            <block wx:for="{{vehicleInfoList}}" wx:key="item">
+                                <swiper-item>
+                                    <!-- <navigator url='../parkrecord/parkrecord' hover-class='none'> -->
+                                    <!-- 车辆没驶入状态 -->
+                                    <block wx:if="{{item.parkstate=='0'}}">
+                                        <view class="car-card-box">
+                                            <view class="card-info not-into">
+                                                <view class="card-info-main">
+                                                    <image src="../../images/pic_cheliang.png" mode="widthFix"></image>
+                                                    <view class="text-desc">{{item.hphm}}</view>
+                                                    <view class="text-tip">您尚未驶入停车场</view>
+                                                </view>
+                                            </view>
+                                        </view>
+                                    </block>
+                                    <!-- 正在停车 -->
+                                    <block wx:else>
+                                        <view class="car-card-box">
+                                            <view class="card-info parking">
+                                                <!-- 停车点 -->
+                                                <block wx:if="{{item.businesstype == '1'}}">
+                                                    <view class="card-info-main inroad">
+                                                        <view class="park-state"  style="padding: 20rpx 20rpx 0 20rpx;">
+                                                            <view class="car-plate">
+                                                                <image src="../../images/icon_chepai.png"></image>
+                                                                <text>{{item.hphm}}</text>
+                                                            </view>
+                                                            <view class="text-time">
+                                                                {{item.parktimestr}}入场
+                                                            </view>
+                                                        </view>
+                                                        <view wx:if="{{!item.isShowPay}}" class="count-down">
+                                                            {{item.free}}
+                                                        </view>
+                                                        <view class="park-total">
+                                                            <view class="total-amount">
+                                                                <view class="text-tip" style="height:40rpx;">
+                                                                    <view style="width:70%;position: absolute;margin-left: 50%;left:-20%;">
+                                                                        <text class="title">应付(元)-刷新至{{item.date}}</text>
+                                                                        <view class="refresh-btn" bindtap="getVehicleList">刷新</view>
+                                                                    </view>
+                                                                </view>
+
+                                                                <text class="text-num" style="height:20rpx;line-height:20rpx;" wx:if="{{item.parkbusinesstype!='12'}}">
+                                                                    {{item.qf}}
+                                                                </text>
+                                                                <text class="text-num" style="height:20rpx;line-height:20rpx;" wx:if="{{item.parkbusinesstype=='12'}}">
+                                                                    0.00
+                                                                </text>
+                                                                <view class="text-tip" wx:if="{{item.parkbusinesstype!='12'}}">
+                                                                    (应付{{item.total}} 已付{{item.pay}})
+                                                                </view>
+                                                                <!-- <text class="text-num">{{item.qf}}</text> -->
+                                                                <!-- <view class="text-tip"> -->
+                                                                <!-- (应付{{item.total}} 已付{{item.pay}}) -->
+                                                                <!-- </view> -->
+                                                            </view>
+                                                        </view>
+                                                        <view class="park-info">
+                                                            <view class="park-addr" style="font-size: 26rpx;">
+                                                                <image src="../../images/icon_tingchechang.png"></image>
+                                                                <view>{{item.parkname}}</view>
+                                                            </view>
+                                                            <view class="park-time" style="font-size: 26rpx;">
+                                                                <image src="../../images/icon_shijian.png"></image>
+                                                                <view>
+                                                                    <text>{{item.parktime}}</text>
+                                                                </view>
+                                                            </view>
+                                                        </view>
+                                                    </view>
+                                                </block>
+                                                <!-- 停车场 -->
+                                                <block wx:if="{{item.businesstype == '2'}}">
+                                                    <view class="card-info-main">
+                                                        <view class="park-state">
+                                                            <view class="car-plate">
+                                                                <image src="../../images/icon_chepai.png"></image>
+                                                                <text>{{item.hphm}}</text>
+                                                            </view>
+                                                            <view wx:if="{{!item.isShowPay}}" class="count-down">
+                                                                {{item.free}}
+                                                            </view>
+                                                        </view>
+                                                        <view class="park-total">
+                                                            <view class="total-amount">
+                                                                <text class="text-tip">停车时长</text>
+                                                                <text class="text-num">
+                                                                    {{item.parktime}}
+                                                                </text>
+                                                                <view class="text-tip">
+                                                                    (已付￥{{item.pay}})
+                                                                </view>
+                                                            </view>
+                                                        </view>
+                                                        <view class="park-info">
+                                                            <view class="park-addr">
+                                                                <image src="../../images/icon_tingchechang.png"></image>
+                                                                <view>{{item.parkname}}</view>
+                                                            </view>
+                                                            <view class="park-time">
+                                                                <image src="../../images/icon_riqi.png"></image>
+                                                                <view>
+                                                                    <text>
+                                                                        {{item.parktimestr}}入场
+                                                                    </text>
+                                                                </view>
+                                                            </view>
+                                                        </view>
+                                                    </view>
+                                                </block>
+                                                <!-- 立即支付按钮 -->
+                                                <!-- <button class="btn-pay" >立即支付</button> -->
+                                                <form bindsubmit="submitInfo" report-submit='true'>
+                                                    <button class="btn-pay {{item.isActivePay?'active':''}}" form-type="submit" hover-class="none" data-item="{{item}}" catchtap='gotoParkpay'>
+                                                        {{item.txtpay}}
+                                                    </button>
+                                                </form>
+                                            </view>
+                                        </view>
+                                    </block>
+                                    <!-- </navigator> -->
+                                </swiper-item>
+                            </block>
+                        </swiper>
+                        <view class="dots">
+                            <block wx:for="{{vehicleInfoList}}" wx:key="item">
+                                <view class="dot{{index == swiperCurrent ? ' active' : ''}}"></view>
+                            </block>
+                        </view>
+                    </block>
+                </view>
+                <!-- 新闻资讯 -->
+                <!-- <view class="news-section">
+                <view class="title-bar">
+                    <view class="title">资讯公告</view>
+                    <view class="arrow">
+                        <image src="../../images/icon_jiantou.png"></image>
+                    </view>
+                </view>
+                <view class="list-box">
+                    <view class="list-item">
+                        <view class="left-con">
+                            <view class="news-title">本停车区域根据宁波市发布的1号文件收费标准</view>
+                            <view>
+                                <text class="news-type">资讯</text>
+                                <text class="news-time">2019-07-08</text>
+                            </view>
+                        </view>
+                        <view class="right-pic">
+                            <image src="../../images/pic_zixun.png"></image>
+                        </view>
+                    </view>
+                    <view class="list-item">
+                        <view class="left-con">
+                            <view class="news-title">本停车区域根据宁波市发布的2号文件收费标准</view>
+                            <view>
+                                <text class="news-type">资讯</text>
+                                <text class="news-time">2019-01-08</text>
+                            </view>
+                        </view>
+                        <view class="right-pic">
+                            <image src="../../images/pic_zixun.png"></image>
+                        </view>
+                    </view>
+                </view>
+            </view> -->
+
+                <!--充电桩提示框-->
+                <view class="chargeMsg" wx:if="{{state == 2}}">
+                    <view class="msgText">您有一个充电订单正在进行中，可前往查看。</view>
+                    <button class="msgBtn" form-type="submit" hover-class="none" bindtap="toPay">去看看</button>
+                </view>
+
+                <!-- 弹出对话框模板 -->
+                <import src="../../components/template/ad/mainfloatlayer.wxml"></import>
+                <template is="mainfloatlayer" data="{{aroundFloatLayerAD:aroundFloatLayerAD}}" wx:if="{{floatLayerAD&&!noShowAD}}"></template>
+                <import src="../../components/template/tipdialog/tipdialog.wxml"></import>
+                <template is="tipdialog" data="" wx:if="{{showQfTip}}"></template>
+                <!-- <import src="../../components/template/topaydialog/topaydialog.wxml"></import> -->
+                <template is="topaydialog" data="" wx:if="{{showTopayTip}}"></template>
+            </view>
+        </scroll-view>
+    </view>
+</navbar>
